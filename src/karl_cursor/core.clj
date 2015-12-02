@@ -1,116 +1,111 @@
-(ns karl-cursor.core
-  (:gen-class))
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
-
-
-(def x (atom nil))
-
-(swap! x (constantly 1))
-
-(def x {:a {:b 42}})
-
-(get x :a)
-(get-in x [:a :b])
+(ns karl-cursor.core)
 
 
 
-(defn get-in' [m ks]
-  (reduce #(get %1 %2)
-          m
-          ks))
+(def store (atom {:a {:b 1}, :xs [1 2 3]}))
 
-(defn get-in'' [m ks]
-  (reduce get m ks))
+(deref store)
+@store
+(.deref store)
+
+(.swap! store (fn [x] (inc x)))
+
+(swap! store #(inc %))
+
+(swap! store identity)
+
+(def store (atom {:a {:b 1}}))
+
+(deref store)
+({:a 1} :a)
+
+([1 2 3] 1)
+([1 2 3])
 
 
-(update-in x [:a :b] #(+ %1 1 2 3))
+(list 1 2 3)
+(next (list 1 2 3))
 
-(update-in x [:a :b] + 1 2 3)
+(:b
+  (:a
+    (deref store)))
 
-(def y (atom {:a {:b 42}}))
+(-> (deref store) (:a) (:b))
 
-(swap! y update-in :d + 1)
+(macroexpand '(-> (deref store) :a :b))
 
-(swap! y #(update-in %1 [:c :d] inc))
+(get-in @store [:a :b])
 
-(swap! y update-in [:c :d] inc)
+(reduce + [10 1 2 3])
 
-[:c d]
+(reduce get @store [:a :b])
+(reduce get [@store, :a, :b])
 
-(defn get-in-atom [path] )
+(list 1 2 (+ 3 0))
+'(1 2 (+ 3 0))
+`(1 2 ~(+ 3 0))
 
+(update [1 2 3] 1 (constantly 5))
+
+(update @store :a #(update % :b (constantly 5)))
+
+;(-> @store
+;    #(update :a %)
+;    #(update :b % (constantly 5)))
+
+;(reduce update [@store :a :b (constantly 5)])
+
+(update-in @store [:xs] #(conj % 9))
+
+(-> @store
+    (update-in [:xs] #(conj % 9))
+    (update-in [:xs] #(conj % 9)))
+
+(update @store :a #(update % :b (constantly 5)))
+;(swap! store #(inc %))
+@store
+(swap! store #(update-in % [:a :b] (constantly 5)))
 
 
 (defrecord Cursor [value swap path])
+(let [c (Cursor. nil nil nil)]
+  (assoc c :value 10))
 
-(defn build-cursor [value swap]
-  (Cursor. value swap []))
+(defprotocol IFoo
+  (foo [this])
+  (sum [this c]))
 
-
-(defn refine-cursor [cur more-paths]
-  (Cursor. (:value cur)
-           (:swap cur)
-           (concat (:path cur) more-paths)))
-
-(defn cursor-value [cur]
-  (get-in (:value cur) (:path cur)))
-
-(comment
-  (def store (atom {:a {:b {:c 42}}}))
-  (def cur (build-cursor @store #(swap! store %1)))
-  (def cur' (refine-cursor cur [:a :b :c]))
-  (cursor-value cur')
-
-  ((:swap cur') inc)
-
-
+(deftype Foo [a b]
+  IFoo
+  (foo [this] nil)
+  (sum [this c] (+ (get this a) (get this b) c))
   )
 
+(-> (new Foo 1 2)
+    (.sum 3))
 
 (defprotocol ICursor
+  (refine [this a])
   (value [this])
-  (refine [this more-paths])
-  (swap!' [this update-fn])
+  (swap [this newvalue])
+  (= [this other])
   )
 
-
-
-
-(deftype Cursor2 [store paths value]
-
+(deftype Cursor [store, path, value]
   ICursor
-  (value [this] (get-in value paths))
-  (refine [this more-paths] (Cursor2. store (concat paths more-paths) value))
-  (swap!' [this update-fn] (swap! store update-in paths update-fn))
-
+  (refine [this a] (new Cursor store (conj path a) (get-in value (conj path a))))
+  (value [this] value)
+  (swap [this f] (swap! store #(update-in % path f)))
   )
 
-(defn cursor [store] (Cursor2. store [] @store))
+(defn buildCursor [store] (new Cursor store [] @store))
 
+(def store (atom {:a {:b 1}, :xs [1 2 3]}))
 
-(comment
+(def x (buildCursor store))
 
-  (def store (atom {:a { :b 42 }}))
-  (def c (cursor store))
-  (.value (.refine c [:a :b]))
+(.value x)
 
-  (-> c (.refine [:a :b]) (.swap!' inc))
+(-> x (.refine :a) (.value))
 
-  (.value (.refine c [:a :b]))
-
-  )
-
-
-
-
-
-
-
-
-
-
-
+(-> x (.refine :a) (.swap (constantly 2)))
