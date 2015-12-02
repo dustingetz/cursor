@@ -2,21 +2,24 @@
 
 
 (defprotocol ICursor
-  (refine [this a])
-  (value [this])
-  (swap [this newvalue])
+  (refine [_ a])
+  (value [_])
+  (swap [_ f])
   )
 
 
-(deftype Cursor [value, path, swap-fn!]
+(deftype Cursor [value, swap-fn!]
   ICursor
-  (refine [this a] (new Cursor (get-in value (conj path a)) (conj path a) swap-fn!))
-  (value [this] value)
-  (swap [this f] (swap-fn! #(update-in % path f)))
+  (refine [_ path] (new Cursor
+                        (get-in value [path])
+                        (fn [f]
+                          (swap-fn! #(update-in % [path] f)))))
+  (value [_] value)
+  (swap [_ f] (swap-fn! f))
   )
 
 
-(defn buildCursor [store] (new Cursor @store [] #(swap! store %)))
+(defn buildCursor [store] (new Cursor @store #(swap! store %)))
 
 
 (comment
