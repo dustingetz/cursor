@@ -3,7 +3,6 @@
 
 (defprotocol ICursor
   (refine [this segment] [this segment not-found])
-  (value [_])
   )
 
 (defn root-at [segments f] #(update-in % segments f))
@@ -13,6 +12,9 @@
     (f {:a {:b 0}})))
 
 (deftype Cursor [value, swap-fn!]
+  clojure.lang.IDeref
+  (deref [_] value)
+
   ICursor
   (refine [this segment] (.refine this segment nil))
   (refine [_ segment not-found]
@@ -21,7 +23,6 @@
          (fn [f]
            (swap-fn! (root-at [segment] (fn [v] (f (or v not-found))))))
          ))
-  (value [_] value)
 
   clojure.lang.IAtom
   (swap [_ f] (swap-fn! f))
@@ -40,7 +41,7 @@
   (-> cur (.swap (fn [x] x)))
   (-> cur (.refine :c {:d 10}) (.refine :d)  (.swap (fn [x] x)))
 
-  (-> cur (.refine :c {:d 10}) (.refine :d) (.value))
+  (-> cur (.refine :c {:d 10}) (.refine :d) (.deref))
 
   (-> cur (.refine :c {:d 10}) (.refine :d) (.swap (constantly 11)))
 
