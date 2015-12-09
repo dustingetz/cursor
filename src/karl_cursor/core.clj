@@ -4,7 +4,6 @@
 (defprotocol ICursor
   (refine [this segment] [this segment not-found])
   (value [_])
-  (swap [_ f])
   )
 
 (defn root-at [segments f] #(update-in % segments f))
@@ -23,7 +22,12 @@
            (swap-fn! (root-at [segment] (fn [v] (f (or v not-found))))))
          ))
   (value [_] value)
+
+  clojure.lang.IAtom
   (swap [_ f] (swap-fn! f))
+  (swap [_ f x] (swap-fn! #(f % x)))
+  (swap [_ f x y] (swap-fn! #(f % x y)))
+  (swap [_ f x y args] (swap-fn! #(apply f % x y args)))
   )
 
 
@@ -44,7 +48,7 @@
   (-> cur (.refine :c {:d 10}) (.swap #(merge % {:z 99})))
   (-> cur (.refine :c {:d 10}) (.swap merge {:z 99}))
   (-> cur (.refine :c {:d 10}) (.refine :d) (.swap #(+ % 1 2 3)))
-  (-> cur (.refine :c {:d 10}) (.refine :d) (.swap + 1 2 3))
+  (-> cur (.refine :c {:d 10}) (.refine :d) (swap! + 1 2 3))
 
   @store
   )
