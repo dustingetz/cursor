@@ -15,9 +15,7 @@
 
 (def cur (cursor/buildCursor store))
 
+
 (deftest value []
   (is (= (.value cur) {:a {:b 1}, :xs [1 2 3]})))
 
-
-(deftest x []
-  (is (= (-> cur (.swap (fn [x] x)) (.value)) (.value cur))))
