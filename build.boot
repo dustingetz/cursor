@@ -27,6 +27,7 @@
          (comp (testing)
                (test-cljs :js-env :node
                           :exit?  true)))
+
 (deftask auto-cljs-test []
          (comp (testing)
                (watch)

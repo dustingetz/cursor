@@ -30,7 +30,8 @@
 
 (comment
 
-  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap (fn [x] x)))
+
+
   (-> (cur [:c] {:d 10}) (.invoke [:d]) (.deref))
   (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap (constantly 11)))
 
