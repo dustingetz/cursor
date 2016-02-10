@@ -35,15 +35,18 @@
   (def cur (buildCursor store))
   (-> cur (.swap (fn [x] x)))
 
-  (-> cur (.invoke [:c] {:d 10}) (.invoke [:d])  (.swap (fn [x] x)))
-  (-> cur (.invoke [:c] {:d 10}) (.invoke [:d]) (.deref))
-  (-> cur (.invoke [:c] {:d 10}) (.invoke [:d]) (.swap (constantly 11)))
+  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap (fn [x] x)))
+  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.deref))
+  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap (constantly 11)))
 
 
-  (-> cur (.invoke [:c] {:d 10}) (.swap #(merge % {:z 99})))
-  (-> cur (.invoke [:c] {:d 10}) (.swap merge {:z 99}))
-  (-> cur (.invoke [:c] {:d 10}) (.invoke [:d]) (.swap #(+ % 1 2 3)))
-  (-> cur (.invoke [:c] {:d 10}) (.invoke [:d]) (swap! + 1 2 3))
+  (-> (cur [:c] {:d 10}) (.swap #(merge % {:z 99})))
+  (-> (cur [:c] {:d 10}) (.swap merge {:z 99}))
+  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap #(+ % 1 2 3)))
+  (-> (cur [:c] {:d 10}) (.invoke [:d]) (swap! + 1 2 3))
+
+  (-> (cur [:c] {:d 10}) (.swap #(merge % {:z 99})))
+  (macroexpand '(-> (cur [:c] {:d 10}) (.swap #(merge % {:z 99}))))
 
   @(cur [:a :b :c] {:d 10})
   @(cur)
