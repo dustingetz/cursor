@@ -1,11 +1,7 @@
 (ns cljs-cursor.core)
 
+
 (defn root-at [segments f] #(update-in % segments f))
-
-(comment
-  (let [f (root-at [:a :b] inc)]
-    (f {:a {:b 0}})))
-
 
 
 (defprotocol ICursor
@@ -33,9 +29,6 @@
 
 
 (comment
-  (def store (atom {:a {:b 1}, :xs [1 2 3]}))
-  (def cur (buildCursor store))
-  (-> cur (.swap (fn [x] x)))
 
   (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap (fn [x] x)))
   (-> (cur [:c] {:d 10}) (.invoke [:d]) (.deref))

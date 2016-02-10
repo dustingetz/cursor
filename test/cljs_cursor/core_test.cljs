@@ -3,9 +3,21 @@
   (:require [cljs.test]
             [cljs-cursor.core :as cursor]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
 
-(deftest test-arithmetic []
-  (is (= (+ 0.1 0.2) 0.3) "Something foul is a float."))
+(deftest test-root-at []
+  (is (= (let [f (cursor/root-at [:a :b] inc)]
+           (f {:a {:b 0}}))
+         {:a {:b 1}})))
+
+
+(def store (atom {:a {:b 1}, :xs [1 2 3]}))
+
+
+(def cur (cursor/buildCursor store))
+
+(deftest value []
+  (is (= (.value cur) {:a {:b 1}, :xs [1 2 3]})))
+
+
+(deftest x []
+  (is (= (-> cur (.swap (fn [x] x)) (.value)) (.value cur))))
