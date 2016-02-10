@@ -1,4 +1,4 @@
-(ns karl-cursor.core)
+(ns cljs-cursor.core)
 
 (defn root-at [segments f] #(update-in % segments f))
 
@@ -6,24 +6,26 @@
   (let [f (root-at [:a :b] inc)]
     (f {:a {:b 0}})))
 
-(deftype Cursor [value, swap-fn!]
-  clojure.lang.IDeref
-  (deref [_] value)
 
-  clojure.lang.IFn
-  (invoke [this segments] (.invoke this segments nil))
-  (invoke [_ segments not-found]
+
+(defprotocol ICursor
+  (refine [this segments] [this segments not-found])
+  (value [_])
+  (swap [_ f])
+)
+
+
+(deftype Cursor [value, swap-fn!]
+  ICursor
+  (value [_] value)
+  (refine [this segments] (.refine this segments nil))
+  (refine [_ segments not-found]
     (new Cursor
          (get-in value segments not-found)
          (fn [f]
            (swap-fn! (root-at segments (fn [v] (f (or v not-found))))))
          ))
-
-  clojure.lang.IAtom
   (swap [_ f] (swap-fn! f))
-  (swap [_ f x] (swap-fn! #(f % x)))
-  (swap [_ f x y] (swap-fn! #(f % x y)))
-  (swap [_ f x y args] (swap-fn! #(apply f % x y args)))
   )
 
 
