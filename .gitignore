@@ -12,3 +12,4 @@ pom.xml.asc
 .idea/
 *.iml
 .nrepl-history
+.DS_STORE

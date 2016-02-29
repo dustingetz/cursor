@@ -14,7 +14,7 @@
 (deftype Cursor [value, swap-fn!]
   ICursor
   (value [_] value)
-  (refine [this segments] (.refine this segments nil))
+  (refine [this segments] (refine this segments nil))
   (refine [_ segments not-found]
     (new Cursor
          (get-in value segments not-found)
