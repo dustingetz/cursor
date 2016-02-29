@@ -32,3 +32,7 @@
          (comp (testing)
                (watch)
                (test-cljs :js-env :node)))
+
+(deftask test-all []
+         (comp (clj-test)
+               (cljs-test)))

@@ -26,27 +26,3 @@
 
 
 (defn buildCursor [store] (new Cursor @store #(swap! store %)))
-
-
-(comment
-
-
-
-  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.deref))
-  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap (constantly 11)))
-
-
-  (-> (cur [:c] {:d 10}) (.swap #(merge % {:z 99})))
-  (-> (cur [:c] {:d 10}) (.swap merge {:z 99}))
-  (-> (cur [:c] {:d 10}) (.invoke [:d]) (.swap #(+ % 1 2 3)))
-  (-> (cur [:c] {:d 10}) (.invoke [:d]) (swap! + 1 2 3))
-
-  (-> (cur [:c] {:d 10}) (.swap #(merge % {:z 99})))
-  (macroexpand '(-> (cur [:c] {:d 10}) (.swap #(merge % {:z 99}))))
-
-  @(cur [:a :b :c] {:d 10})
-  @(cur)
-  @cur
-
-  @store
-  )

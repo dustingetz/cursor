@@ -47,9 +47,15 @@
   (is (= @store initialMap)))
 
 
-(deftest identity-swap2 []
+(deftest test-default-refines []
   (is (= (-> cur (cursor/refine [:c] {:d 10}) (cursor/refine [:d]) cursor/value) 10))
   (let [dcur (-> cur (cursor/refine [:c] {:d 10}) (cursor/refine [:d]))]
     (cursor/swap dcur identity)
-    (is (= (cursor/value dcur) 10)))
-)
+    (is (= (cursor/value dcur) 10))
+    (cursor/swap dcur (constantly 11))
+    (is (= (cursor/value dcur) 10))
+    (is (= (-> (cursor/buildCursor store) (cursor/refine [:c :d]) cursor/value) 11))))
+
+(deftest swap-merge []
+         (-> cur (cursor/refine [:a]) (cursor/swap #(merge % {:z 99})))
+         (is (= (get-in @store [:a :z]) 99)))
