@@ -22,4 +22,4 @@
          (reset [o v] (swap! o (constantly v)))
          )
 
-(defn buildCursor [store] (new Cursor @store #(swap! store %)))
+(defn cursor [store] (new Cursor @store #(swap! store %)))
