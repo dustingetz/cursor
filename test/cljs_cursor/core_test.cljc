@@ -18,25 +18,25 @@
 (deftest test-value []
   (let [store (atom {:a 0})
         cur (cursor/buildCursor store)]
-    (is (= (deref cur) {:a 0}))))
+    (is (= @cur {:a 0}))))
 
 
 (deftest test-swap []
   (let [store (atom 0)
         cur (cursor/buildCursor store)]
-    (cursor/swap cur inc)
+    (swap! cur inc)
     (is (= @store 1))))
 
 
 (deftest test-refine []
   (let [store (atom {:a 0})
         cur (cursor/buildCursor store)]
-  (is (= (-> cur (cursor/refine [:a]) deref) 0))))
+  (is (=  @(cur [:a]) 0))))
 
 (deftest refine-not-found []
   (let [store (atom {:a 0})
         cur (cursor/buildCursor store)]
-    (is (= (-> cur (cursor/refine [:b] 42) deref) 42))))
+    (is (= @(cur [:b] 42) 42))))
 
 
 (def initialMap {:a {:b 1}, :xs [1 2 3]})
@@ -45,19 +45,19 @@
 
 
 (deftest identity-swap1 []
-  (-> cur (cursor/swap identity))
+  (-> cur (swap! identity))
   (is (= @store initialMap)))
 
 
 (deftest test-default-refines []
-  (is (= (-> cur (cursor/refine [:c] {:d 10}) (cursor/refine [:d]) deref) 10))
-  (let [dcur (-> cur (cursor/refine [:c] {:d 10}) (cursor/refine [:d]))]
-    (cursor/swap dcur identity)
-    (is (= (deref dcur) 10))
-    (cursor/swap dcur (constantly 11))
-    (is (= (deref dcur) 10))
-    (is (= (-> (cursor/buildCursor store) (cursor/refine [:c :d]) deref) 11))))
+  (is (= @((cur [:c] {:d 10}) [:d]) 10))
+  (let [dcur ((cur [:c] {:d 10}) [:d])]
+    (swap! dcur identity)
+    (is (= @dcur 10))
+    (swap! dcur (constantly 11))
+    (is (= @dcur 10))
+    (is (= @((cursor/buildCursor store) [:c :d]) 11))))
 
 (deftest swap-merge []
-         (-> cur (cursor/refine [:a]) (cursor/swap #(merge % {:z 99})))
+         (-> (cur [:a]) (swap! merge {:z 99}))
          (is (= (get-in @store [:a :z]) 99)))

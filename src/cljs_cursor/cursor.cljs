@@ -1,26 +1,24 @@
 (ns cljs-cursor.cursor
   (:require [cljs-cursor.root-at :refer [root-at]]))
 
-
-(defprotocol ICursor
-             (refine [this segments] [this segments not-found])
-             (swap [_ f])
-             )
-
-
 (deftype Cursor [value, swap-fn!]
          IDeref
          (-deref [_] value)
 
-         ICursor
-         (refine [this segments] (refine this segments nil))
-         (refine [_ segments not-found]
+         IFn
+         (-invoke [this segments] (this segments nil))
+         (-invoke [_ segments not-found]
                  (new Cursor
                       (get-in value segments not-found)
                       (fn [f]
                           (swap-fn! (root-at segments (fn [v] (f (or v not-found))))))
                       ))
-         (swap [_ f] (swap-fn! f))
+
+         ISwap
+         (-swap! [_ f] (swap-fn! f))
+         (-swap! [_ f x] (swap-fn! #(f % x)))
+         (-swap! [_ f x y] (swap-fn! #(f % x y)))
+         (-swap! [_ f x y args] (swap-fn! #(apply f % x y args)))
          )
 
 (defn buildCursor [store] (new Cursor @store #(swap! store %)))
