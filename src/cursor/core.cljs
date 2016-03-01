@@ -1,5 +1,5 @@
-(ns cljs-cursor.cursor
-  (:require [cljs-cursor.root-at :refer [root-at]]))
+(ns cursor.core
+  (:require [cursor.root-at :refer [root-at]]))
 
 (deftype Cursor [value, swap-fn!]
          IDeref

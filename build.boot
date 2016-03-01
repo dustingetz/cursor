@@ -12,7 +12,7 @@
 
 
 (task-options!
-  pom  {:project     'org.prognostic-llc/cljs-cursor
+  pom  {:project     'org.prognostic/cursor
         :version     "0.0.1-SNAPSHOT"})
 
 (deftask testing []

@@ -1,12 +1,12 @@
-#?(:clj  (ns cljs-cursor.core-test
+#?(:clj  (ns cursor.core-test
              (:require [clojure.test :refer [deftest testing is]]
-                       [cljs-cursor.cursor :as cursor]
-                       [cljs-cursor.root-at :refer [root-at]]))
-   :cljs (ns cljs-cursor.core-test
+                       [cursor.core :as cursor]
+                       [cursor.root-at :refer [root-at]]))
+   :cljs (ns cursor.core-test
            (:require-macros [cljs.test :refer [deftest testing is]])
            (:require [cljs.test]
-                     [cljs-cursor.cursor :as cursor]
-                     [cljs-cursor.root-at :refer [root-at]])))
+                     [cursor.core :as cursor]
+                     [cursor.root-at :refer [root-at]])))
 
 
 (deftest test-root-at []
