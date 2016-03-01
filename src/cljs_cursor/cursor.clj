@@ -19,6 +19,7 @@
          (swap [_ f x] (swap-fn! #(f % x)))
          (swap [_ f x y] (swap-fn! #(f % x y)))
          (swap [_ f x y args] (swap-fn! #(apply f % x y args)))
+         (reset [o v] (swap! o (constantly v)))
          )
 
 (defn buildCursor [store] (new Cursor @store #(swap! store %)))

@@ -40,24 +40,40 @@
 
 
 (def initialMap {:a {:b 1}, :xs [1 2 3]})
-(def store (atom initialMap))
-(def cur (cursor/buildCursor store))
-
 
 (deftest identity-swap1 []
-  (-> cur (swap! identity))
-  (is (= @store initialMap)))
+         (let [store (atom initialMap)
+               cur (cursor/buildCursor store)]
+
+              (-> cur (swap! identity))
+              (is (= @store initialMap))))
 
 
 (deftest test-default-refines []
-  (is (= @((cur [:c] {:d 10}) [:d]) 10))
-  (let [dcur ((cur [:c] {:d 10}) [:d])]
-    (swap! dcur identity)
-    (is (= @dcur 10))
-    (swap! dcur (constantly 11))
-    (is (= @dcur 10))
-    (is (= @((cursor/buildCursor store) [:c :d]) 11))))
+         (let [store (atom initialMap)
+               cur (cursor/buildCursor store)]
+              (is (= @((cur [:c] {:d 10}) [:d]) 10))
+              (let [dcur ((cur [:c] {:d 10}) [:d])]
+                   (swap! dcur identity)
+                   (is (= @dcur 10))
+                   (swap! dcur (constantly 11))
+                   (is (= @dcur 10))
+                   (is (= @((cursor/buildCursor store) [:c :d]) 11)))))
 
 (deftest swap-merge []
-         (-> (cur [:a]) (swap! merge {:z 99}))
-         (is (= (get-in @store [:a :z]) 99)))
+         (let [store (atom initialMap)
+               cur (cursor/buildCursor store)]
+              (-> (cur [:a]) (swap! merge {:z 99}))
+              (is (= (get-in @store [:a :z]) 99))))
+
+
+(deftest reset []
+         (let [store (atom initialMap)
+               cur (cursor/buildCursor store)]
+              (is (= @store @cur))
+              (swap! (cur [:a]) (constantly 42))
+              (is (not= @store @cur))
+              (is (= (get-in @store [:a]) 42))
+              (reset! (cur [:a]) 43)
+              (is (= (get-in @store [:a]) 43)))
+         )
