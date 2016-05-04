@@ -16,8 +16,8 @@
 
 
 (task-options!
-  pom  {:project     'org.prognostic/cursor
-        :version     +version+})
+  pom {:project 'org.prognostic/cursor
+       :version +version+})
 
 (deftask testing []
          (merge-env! :source-paths #{"test"})
@@ -30,7 +30,7 @@
 (deftask cljs-test []
          (comp (testing)
                (test-cljs :js-env :node
-                          :exit?  true)))
+                          :exit? true)))
 
 (deftask auto-cljs-test []
          (comp (testing)
