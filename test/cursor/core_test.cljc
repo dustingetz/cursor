@@ -87,6 +87,15 @@
     (is (= 43 (get-in @store [:a :b])))))
 
 
+(deftest test-swap-against-notfound []
+  (let [initial {}
+        store (atom initial)
+        cur (cursor store)]
+    (-> (cur [:a] {:b 1})
+        (swap! update-in [:b] inc))
+    (is (= (get-in @store [:a :b]) 2))))
+
+
 (deftest swap-merge []
   (let [store (atom initialMap)
         cur (cursor store)]
