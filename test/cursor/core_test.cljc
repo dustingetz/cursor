@@ -15,6 +15,12 @@
          {:a {:b 1}})))
 
 
+(deftest test-root-at-no-path []
+  (is (= (let [inc' (root-at [] inc)]
+           (inc' 0))
+         1)))
+
+
 (deftest test-value []
   (let [store (atom {:a 0})
         cur (cursor store)]

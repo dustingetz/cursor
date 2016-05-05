@@ -1,4 +1,7 @@
 (ns cursor.root-at)
 
 
-(defn root-at [segments f] #(update-in % segments f))
+(defn root-at [segments f]
+  (if (seq segments)
+    #(update-in % segments f)
+    f))
