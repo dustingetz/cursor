@@ -7,7 +7,7 @@
                   [org.clojure/clojurescript "1.7.170"]])
 
 (require '[adzerk.boot-cljs :refer :all]
-         '[adzerk.boot-test :refer :all]
+         '[adzerk.boot-test :as boot-test]
          '[crisptrutski.boot-cljs-test :refer [test-cljs]]
          '[adzerk.bootlaces :refer :all])
 
@@ -17,26 +17,14 @@
 
 (task-options!
   pom {:project 'org.prognostic/cursor
-       :version +version+})
+       :version +version+}
+  test-cljs {:js-env :node})
 
 (deftask testing []
          (merge-env! :source-paths #{"test"})
          identity)
 
-(deftask clj-test []
+(deftask test []
          (comp (testing)
-               (test)))
-
-(deftask cljs-test []
-         (comp (testing)
-               (test-cljs :js-env :node
-                          :exit? true)))
-
-(deftask auto-cljs-test []
-         (comp (testing)
-               (watch)
-               (test-cljs :js-env :node)))
-
-(deftask test-all []
-         (comp (clj-test)
-               (cljs-test)))
+               (boot-test/test)
+               (test-cljs)))
