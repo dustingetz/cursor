@@ -1,29 +1,22 @@
 (ns cursor.core
-  (:require [cursor.root-at :refer [root-at]]))
+  (:require [cursor.impl :refer [cursor-deref cursor-invoke cursor-swap! cursor-reset! cursor-cursor]]))
 
 
-(deftype Cursor [value, swap-fn!]
+(deftype Cursor [value swap-fn!]
   clojure.lang.IDeref
-  (deref [_] value)
+  (deref [_] (cursor-deref #(Cursor. %1 %2) value swap-fn! value))
 
   clojure.lang.IFn
-  (invoke [this segments] (this segments nil))
-  (invoke [this segments not-found] (this segments not-found (constantly true)))
-  (invoke [this segments not-found valid?]
-    (new Cursor
-         (let [v (get-in value segments not-found)]
-           ;; we passed the contains check e.g. (contains? {:a nil} :a) => true,
-           ;; but maybe we want a nil value to count as not-found.
-           (if (valid? v) v not-found))
-         (fn [f]
-           (swap-fn! (root-at segments (fn [v] (f (if (valid? v) v not-found))))))))
+  (invoke [_ segments] (cursor-invoke #(Cursor. %1 %2) value swap-fn! segments nil (constantly true)))
+  (invoke [_ segments not-found] (cursor-invoke #(Cursor. %1 %2) value swap-fn! segments not-found (constantly true)))
+  (invoke [_ segments not-found valid?] (cursor-invoke #(Cursor. %1 %2) value swap-fn! segments not-found valid?))
 
   clojure.lang.IAtom
-  (swap [_ f] (swap-fn! f))
-  (swap [_ f x] (swap-fn! #(f % x)))
-  (swap [_ f x y] (swap-fn! #(f % x y)))
-  (swap [_ f x y args] (swap-fn! #(apply f % x y args)))
-  (reset [o v] (swap! o (constantly v))))
+  (swap [_ f] (cursor-swap! #(Cursor. %1 %2) value swap-fn! f))
+  (swap [_ f x] (cursor-swap! #(Cursor. %1 %2) value swap-fn! f x))
+  (swap [_ f x y] (cursor-swap! #(Cursor. %1 %2) value swap-fn! f x y))
+  (swap [_ f x y args] (apply cursor-swap! #(Cursor. %1 %2) value swap-fn! f x y args))
+  (reset [o v] (cursor-reset! #(Cursor. %1 %2) value swap-fn! o v)))
 
 
-(defn cursor [store] (new Cursor @store #(swap! store %)))
+(defn cursor [store] (cursor-cursor #(Cursor. %1 %2) store))
