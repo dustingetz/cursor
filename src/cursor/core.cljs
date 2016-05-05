@@ -1,5 +1,7 @@
 (ns cursor.core
-  (:require [cursor.root-at :refer [root-at]]))
+  (:require [cursor.root-at :refer [root-at]]
+            [cursor.get-in :refer [get-in']]))
+
 
 (deftype Cursor [value, swap-fn!]
   IDeref
@@ -7,9 +9,10 @@
 
   IFn
   (-invoke [this segments] (this segments nil))
-  (-invoke [_ segments not-found]
+  (-invoke [this segments not-found] (this segments not-found get))
+  (-invoke [this segments not-found get']
     (new Cursor
-         (get-in value segments not-found)
+         (get-in' value segments not-found get')
          (fn [f]
            (swap-fn! (root-at segments (fn [v] (f (or v not-found))))))))
 
