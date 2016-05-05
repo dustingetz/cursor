@@ -1,22 +1,22 @@
 (ns cursor.core
-  (:require [cursor.impl :refer [cursor-deref cursor-invoke cursor-swap! cursor-reset! cursor-cursor]]))
+  (:require [cursor.impl :refer [deref* invoke* swap!* reset!* cursor*]]))
 
 
 (deftype Cursor [value swap-fn!]
   clojure.lang.IDeref
-  (deref [_] (cursor-deref #(Cursor. %1 %2) value swap-fn! value))
+  (deref [_] (deref* #(Cursor. %1 %2) value swap-fn!))
 
   clojure.lang.IFn
-  (invoke [_ segments] (cursor-invoke #(Cursor. %1 %2) value swap-fn! segments nil (constantly true)))
-  (invoke [_ segments not-found] (cursor-invoke #(Cursor. %1 %2) value swap-fn! segments not-found (constantly true)))
-  (invoke [_ segments not-found valid?] (cursor-invoke #(Cursor. %1 %2) value swap-fn! segments not-found valid?))
+  (invoke [_ segments] (invoke* #(Cursor. %1 %2) value swap-fn! segments nil (constantly true)))
+  (invoke [_ segments not-found] (invoke* #(Cursor. %1 %2) value swap-fn! segments not-found (constantly true)))
+  (invoke [_ segments not-found valid?] (invoke* #(Cursor. %1 %2) value swap-fn! segments not-found valid?))
 
   clojure.lang.IAtom
-  (swap [_ f] (cursor-swap! #(Cursor. %1 %2) value swap-fn! f))
-  (swap [_ f x] (cursor-swap! #(Cursor. %1 %2) value swap-fn! f x))
-  (swap [_ f x y] (cursor-swap! #(Cursor. %1 %2) value swap-fn! f x y))
-  (swap [_ f x y args] (apply cursor-swap! #(Cursor. %1 %2) value swap-fn! f x y args))
-  (reset [o v] (cursor-reset! #(Cursor. %1 %2) value swap-fn! o v)))
+  (swap [_ f] (swap!* #(Cursor. %1 %2) value swap-fn! f))
+  (swap [_ f x] (swap!* #(Cursor. %1 %2) value swap-fn! f x))
+  (swap [_ f x y] (swap!* #(Cursor. %1 %2) value swap-fn! f x y))
+  (swap [_ f x y args] (apply swap!* #(Cursor. %1 %2) value swap-fn! f x y args))
+  (reset [o v] (reset!* #(Cursor. %1 %2) value swap-fn! o v)))
 
 
-(defn cursor [store] (cursor-cursor #(Cursor. %1 %2) store))
+(defn cursor [store] (cursor* #(Cursor. %1 %2) store))
