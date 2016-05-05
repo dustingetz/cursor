@@ -72,7 +72,10 @@
         cur (cursor store)
         bcur (cur [:a :b] 42)]                              ; nil is what we want, don't return not found
     (is (= @bcur nil))
-    (is (thrown? #?(:clj NullPointerException :cljs :default) (swap! bcur inc)))
+    (swap! bcur (fn [v]
+                  ; when we swap, we expext the valid value of nil
+                  (assert (nil? v))
+                  v))
     (is (= nil (get-in @store [:a :b]))))
 
   (let [initial {:a {:b nil}}
