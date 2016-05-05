@@ -7,9 +7,9 @@
   (-deref [_] (deref* #(Cursor. %1 %2) value swap-fn!))
 
   IFn
-  (-invoke [_ segments] (invoke* #(Cursor. %1 %2) value swap-fn! segments nil (constantly true)))
-  (-invoke [_ segments not-found] (invoke* #(Cursor. %1 %2) value swap-fn! segments not-found (constantly true)))
-  (-invoke [_ segments not-found valid?] (invoke* #(Cursor. %1 %2) value swap-fn! segments not-found valid?))
+  (-invoke [_ segments] (invoke* #(Cursor. %1 %2) value swap-fn! segments nil (constantly false)))
+  (-invoke [_ segments not-found] (invoke* #(Cursor. %1 %2) value swap-fn! segments not-found (constantly false)))
+  (-invoke [_ segments not-found invalid?] (invoke* #(Cursor. %1 %2) value swap-fn! segments not-found invalid?))
 
   ISwap
   (-swap! [_ f] (swap!* #(Cursor. %1 %2) value swap-fn! f))

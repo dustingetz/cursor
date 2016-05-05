@@ -5,14 +5,14 @@
 (defn deref* [ctor value swap-fn!] value)
 
 
-(defn invoke* [ctor value swap-fn! segments not-found valid?]
+(defn invoke* [ctor value swap-fn! segments not-found invalid?]
   (ctor
     (let [v (get-in value segments not-found)]
       ;; we passed the contains check e.g. (contains? {:a nil} :a) => true,
       ;; but maybe we want a nil value to count as not-found.
-      (if (valid? v) v not-found))
+      (if (invalid? v) not-found v))
     (fn [f]
-      (swap-fn! (root-at segments (fn [v] (f (if (valid? v) v not-found))))))))
+      (swap-fn! (root-at segments (fn [v] (f (if (invalid? v) not-found v))))))))
 
 
 (defn swap!* [ctor value swap-fn! f & args]

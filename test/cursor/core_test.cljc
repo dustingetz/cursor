@@ -78,7 +78,7 @@
   (let [initial {:a {:b nil}}
         store (atom initial)
         cur (cursor store)
-        bcur (cur [:a :b] 42 #(not= nil %))]                ; not-found is what we want, don't return nil
+        bcur (cur [:a :b] 42 nil?)]                         ; not-found is what we want, don't return nil
     (is (= @bcur 42))
     (swap! bcur inc)
     (is (= 43 (get-in @store [:a :b])))))
