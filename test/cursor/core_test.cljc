@@ -66,6 +66,24 @@
       (is (= @dcur 10))
       (is (= @((cursor store) [:c :d]) 11)))))
 
+(deftest test-default-refines-with-valid-nil []
+  (let [initial {:a {:b nil}}
+        store (atom initial)
+        cur (cursor store)
+        bcur (cur [:a :b] 42)]                              ; nil is what we want, don't return not found
+    (is (= @bcur nil))
+    (is (thrown? #?(:clj NullPointerException :cljs :default) (swap! bcur inc)))
+    (is (= nil (get-in @store [:a :b]))))
+
+  (let [initial {:a {:b nil}}
+        store (atom initial)
+        cur (cursor store)
+        bcur (cur [:a :b] 42 #(not= nil %))]                ; not-found is what we want, don't return nil
+    (is (= @bcur 42))
+    (swap! bcur inc)
+    (is (= 43 (get-in @store [:a :b])))))
+
+
 (deftest swap-merge []
   (let [store (atom initialMap)
         cur (cursor store)]

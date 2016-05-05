@@ -5,3 +5,7 @@
   (if (seq segments)
     #(update-in % segments f)
     f))
+
+
+(comment
+  (= (root-at [] inc) inc))

@@ -1,6 +1,5 @@
 (ns cursor.core
-  (:require [cursor.root-at :refer [root-at]]
-            [cursor.get-in :refer [get-in']]))
+  (:require [cursor.root-at :refer [root-at]]))
 
 
 (deftype Cursor [value, swap-fn!]
@@ -9,12 +8,15 @@
 
   IFn
   (-invoke [this segments] (this segments nil))
-  (-invoke [this segments not-found] (this segments not-found get))
-  (-invoke [this segments not-found get']
+  (-invoke [this segments not-found] (this segments not-found (constantly true)))
+  (-invoke [this segments not-found valid?]
     (new Cursor
-         (get-in' value segments not-found get')
+         (let [v (get-in value segments not-found)]
+           ;; we passed the contains check e.g. (contains? {:a nil} :a) => true,
+           ;; but maybe we want a nil value to count as not-found.
+           (if (valid? v) v not-found))
          (fn [f]
-           (swap-fn! (root-at segments (fn [v] (f (or v not-found))))))))
+           (swap-fn! (root-at segments (fn [v] (f (if (valid? v) v not-found))))))))
 
 
   ISwap
