@@ -46,3 +46,35 @@
 
 
 (defn cursor [store] (cursor* ctor store))
+
+
+(deftype WriteOnlyCursor [cur]
+  IFn
+  (-invoke [_ segments]
+    (WriteOnlyCursor. (cur segments)))
+  (-invoke [_ segments not-found]
+    (WriteOnlyCursor. (cur segments not-found)))
+  (-invoke [_ segments not-found invalid?]
+    (WriteOnlyCursor. (cur segments not-found invalid?)))
+
+  ISwap
+  (-swap! [_ f]
+    (swap! cur f))
+  (-swap! [_ f x]
+    (swap! cur f x))
+  (-swap! [_ f x y]
+    (swap! cur f x y))
+  (-swap! [_ f x y args]
+    (apply swap! cur f x y args))
+
+  IReset
+  (-reset! [_ v]
+    (reset! cur v))
+
+  IHash
+  (-hash [_]
+    (hash (str (hash (.-all-segments cur)) "-" (hash (.-store cur)))))
+
+  IEquiv
+  (-equiv [o other]
+    (and (instance? WriteOnlyCursor other) (= (hash o) (hash other)))))
