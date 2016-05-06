@@ -1,5 +1,6 @@
 (ns cursor.impl
-  (:require [cursor.root-at :refer [root-at]]))
+  (:require [cursor.root-at :refer [root-at]]
+            [clojure.string :as string]))
 
 
 (defn deref* [value] value)
@@ -32,8 +33,10 @@
   (swap! o (constantly v)))
 
 
-(defn hash* [value segments store]
-  (hash (str (hash value) "-" (hash segments) "-" (hash store))))
+(defn hash* [& args]
+  (->> (map hash args)
+       (string/join "-")
+       hash))
 
 
 (defn cursor* [ctor store]

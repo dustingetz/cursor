@@ -2,7 +2,7 @@
   (:require [cursor.impl :refer [deref* invoke* swap!* reset!* cursor* hash*]]))
 
 
-(declare ctor)
+(declare ->Cursor)
 
 
 (deftype Cursor [value swap-fn! all-segments store]
@@ -12,11 +12,11 @@
 
   clojure.lang.IFn
   (invoke [_ segments]
-    (invoke* ctor value swap-fn! segments all-segments store))
+    (invoke* ->Cursor value swap-fn! segments all-segments store))
   (invoke [_ segments not-found]
-    (invoke* ctor value swap-fn! segments all-segments store :not-found not-found))
+    (invoke* ->Cursor value swap-fn! segments all-segments store :not-found not-found))
   (invoke [_ segments not-found invalid?]
-    (invoke* ctor value swap-fn! segments all-segments store :not-found not-found :invalid? invalid?))
+    (invoke* ->Cursor value swap-fn! segments all-segments store :not-found not-found :invalid? invalid?))
 
   clojure.lang.IAtom
   (swap [_ f]
@@ -37,15 +37,11 @@
     (hash* value all-segments store))
 
   Object
-  (equals [o other]
-    (and (instance? Cursor other) (= (hash o) (hash other)))))
+  (equals [o o']
+    (and (instance? Cursor o') (= (hash o) (hash o')))))
 
 
-(defn- ctor [value swap-fn! all-segments store]
-  (Cursor. value swap-fn! all-segments store))
-
-
-(defn cursor [store] (cursor* ctor store))
+(defn cursor [store] (cursor* ->Cursor store))
 
 
 (deftype WriteOnlyCursor [cur]
@@ -73,7 +69,7 @@
 
   clojure.lang.IHashEq
   (hasheq [_]
-    (hash (str (hash (.all-segments cur)) "-" (hash (.store cur)))))
+    (hash* (.all-segments cur) (.store cur)))
 
   Object
   (equals [o o']
