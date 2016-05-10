@@ -10,13 +10,13 @@
 
 
 (deftest test-root-at []
-  (is (= (let [f (root-at [:a :b] inc)]
+  (is (= (let [f (root-at [:a :b] inc (constantly false) nil)]
            (f {:a {:b 0}}))
          {:a {:b 1}})))
 
 
 (deftest test-root-at-no-path []
-  (is (= (let [inc' (root-at [] inc)]
+  (is (= (let [inc' (root-at [] inc (constantly false) nil)]
            (inc' 0))
          1)))
 
