@@ -1,4 +1,4 @@
-(ns cursor.core
+(ns cursor.platform
   (:require [cursor.impl :refer [deref* invoke* swap!* reset!* cursor* hash*]]))
 
 

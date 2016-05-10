@@ -7,8 +7,8 @@
 
 
 (defn invoke* [ctor value swap-fn! segments all-segments store & {:keys [not-found invalid?]
-                                                                     :or {not-found nil
-                                                                          invalid? (constantly false)}}]
+                                                                  :or {not-found nil
+                                                                       invalid? (constantly false)}}]
   (let [leaf-val (get-in' value segments invalid? not-found)]
     (ctor
       leaf-val

@@ -21,6 +21,9 @@
   test-cljs {:js-env :node})
 
 (deftask testing []
+         ;; Careful, clj and cljs test dependencies are different,
+         ;; and have different weird requirements. cljs tests have to have _test in the filename.
+         ;; clj tests can be found in src namespaces, cljs tests cannot.
          (merge-env! :source-paths #{"test"})
          identity)
 

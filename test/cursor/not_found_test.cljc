@@ -1,7 +1,7 @@
-#?(:clj  (ns cursor.not-found
+#?(:clj  (ns cursor.not-found-test
            (:require [clojure.test :refer [deftest testing is]]
                      [cursor.core :refer [cursor]]))
-   :cljs (ns cursor.not-found
+   :cljs (ns cursor.not-found-test
            (:require-macros [cljs.test :refer [deftest testing is]])
            (:require [cljs.test]
                      [cursor.core :refer [cursor]])))
