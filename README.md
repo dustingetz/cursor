@@ -31,8 +31,9 @@ Cursors are an abstraction for working with recursive or deeply nested values. I
 
 ## API
 
-Cursors look and act like an atom, they can be refined to produce a more nested cursor, and once refined to a subtree 
-there is no way to un-refine. Cursors have value semantics so they are suitable for use in the React.js component lifecycle.
+Cursors look and act like an atom, they can be refined to produce a more nested cursor which is a read/write view into a 
+subtree of the atom. Once refined to a subtree there is no way to un-refine. 
+Cursors have value semantics so they are suitable for use in the React.js component lifecycle.
 
  * IFn, e.g. `(cur [:a])` Refine an existing cursor `cur` with a path vector `[:a]` to produce a new cursor
  * IDeref e.g. `@cur` - inspect the value in the cursor
