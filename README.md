@@ -5,9 +5,10 @@ cursor
 
 ## What is a cursor
 
-Cursors are an abstraction for working with recursive or deeply nested values. I first saw this abstraction in Om. This 
- opinionated implementation is decoupled from any rendering library. Cursors let your app hold all its state at the root 
- of the UI tree; thus the root is stateful, and all downtree views are stateless.
+Cursors are a read/write view into a subtree of an atom. I first saw this abstraction in Om. This implementation is decoupled from any rendering library and is very small.
+
+Cursors are useful in UI programming, because UIs are tree shaped and naturally have tree-shaped state. 
+Cursors let your app hold all its state at the root of the UI tree; thus the root is stateful, and all downtree views are stateless.
  
 ## Example
  
