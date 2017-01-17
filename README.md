@@ -46,4 +46,4 @@ master is stable, there is a test suite.
 
 ## License
 
-_`react-cursor` is governed under the MIT License._
+_`cursor` is governed under the MIT License._
