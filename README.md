@@ -13,6 +13,8 @@ Cursors let your app hold all its state in one place at the root of the UI tree;
 ## Example
  
 ```clojure
+(ns example (:require [cursor.core :refer cursor]))
+
 (defn Counter [label cur]
   [:div
    label (pr-str @cur)
@@ -36,8 +38,10 @@ Cursors look and act like an atom, they can be refined to produce a more nested 
 subtree of the atom. Cursors have value semantics so they are suitable for use in the React.js component lifecycle. One implication of value semantics is that once refined, a cursor can't escape it's subtree, because it's value is that subtree.
 
  * IFn, e.g. `(cur [:a])` Refine an existing cursor `cur` with a path vector `[:a]` to produce a new cursor
- * IDeref e.g. `@cur` - inspect the value in the cursor (deref here has value semantics, unlike atoms which return latest)
- * `hash`, `=`, `swap!`, `reset!`, etc all work as expected. 
+ * IDeref e.g. `@cur` Inspect the value in the cursor (deref here has value semantics, unlike atoms which return latest)
+ * `hash`, `=`, `swap!`, `reset!`, etc all work as expected. Effects impact the backing atom, not the cursor itself.
+ * `cursor.core/cursor` e.g. `(cursor my-atom)` Construct a cursor backed by an atom.
+ * `cursor.core/virtual-cursor` Low-level cursor constructor interface which doesn't assume atom, see source 
 
 ## Project Maturity
 
