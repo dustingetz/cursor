@@ -36,7 +36,7 @@ Cursors look and act like an atom, they can be refined to produce a more nested 
 subtree of the atom. Cursors have value semantics so they are suitable for use in the React.js component lifecycle. One implication of value semantics is that once refined, a cursor can't escape it's subtree, because it's value is that subtree.
 
  * IFn, e.g. `(cur [:a])` Refine an existing cursor `cur` with a path vector `[:a]` to produce a new cursor
- * IDeref e.g. `@cur` - inspect the value in the cursor
+ * IDeref e.g. `@cur` - inspect the value in the cursor (deref here has value semantics, unlike atoms which return latest)
  * `hash`, `=`, `swap!`, `reset!`, etc all work as expected. 
 
 ## Project Maturity
