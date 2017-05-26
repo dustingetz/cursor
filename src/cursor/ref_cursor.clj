@@ -1,22 +1,20 @@
-(ns cursor.platform
+(ns cursor.ref-cursor
   (:require [cursor.impl :refer [deref* invoke* swap!* reset!* hash*]]))
 
 
-(declare ->Cursor)
+(declare ->RefCursor)
 
-
-(deftype Cursor [value swap-fn! all-segments backing-store-hash]
+(deftype RefCursor [deref swap-fn! all-segments backing-store-hash]
   clojure.lang.IDeref
-  (deref [_]
-    (deref* value))
+  (deref [_] (deref))
 
   clojure.lang.IFn
   (invoke [_ segments]
-    (invoke* ->Cursor value swap-fn! segments all-segments backing-store-hash))
+    (invoke* ->RefCursor deref swap-fn! segments all-segments backing-store-hash))
   (invoke [_ segments not-found]
-    (invoke* ->Cursor value swap-fn! segments all-segments backing-store-hash :not-found not-found))
+    (invoke* ->RefCursor deref swap-fn! segments all-segments backing-store-hash :not-found not-found))
   (invoke [_ segments not-found invalid?]
-    (invoke* ->Cursor value swap-fn! segments all-segments backing-store-hash :not-found not-found :invalid? invalid?))
+    (invoke* ->RefCursor deref swap-fn! segments all-segments backing-store-hash :not-found not-found :invalid? invalid?))
 
   clojure.lang.IAtom
   (swap [_ f]
@@ -34,8 +32,8 @@
 
   clojure.lang.IHashEq
   (hasheq [_]
-    (hash* value all-segments backing-store-hash))
+    (hash* (deref) all-segments backing-store-hash))
 
   Object
   (equals [o o']
-    (and (instance? Cursor o') (= (hash o) (hash o')))))
+    (and (instance? RefCursor o') (= (hash o) (hash o')))))
