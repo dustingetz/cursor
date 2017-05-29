@@ -4,17 +4,17 @@
 
 (declare ->RefCursor)
 
-(deftype RefCursor [deref swap-fn! all-segments backing-store-hash]
+(deftype RefCursor [deref! swap-fn! all-segments backing-store-hash]
   IDeref
-  (-deref [_] (deref))
+  (-deref [_] (deref!))
 
   IFn
   (-invoke [_ segments]
-    (invoke* ->RefCursor deref swap-fn! segments all-segments backing-store-hash))
+    (invoke* ->RefCursor deref! swap-fn! segments all-segments backing-store-hash))
   (-invoke [_ segments not-found]
-    (invoke* ->RefCursor deref swap-fn! segments all-segments backing-store-hash :not-found not-found))
+    (invoke* ->RefCursor deref! swap-fn! segments all-segments backing-store-hash :not-found not-found))
   (-invoke [_ segments not-found invalid?]
-    (invoke* ->RefCursor deref swap-fn! segments all-segments backing-store-hash :not-found not-found :invalid? invalid?))
+    (invoke* ->RefCursor deref! swap-fn! segments all-segments backing-store-hash :not-found not-found :invalid? invalid?))
 
   ISwap
   (-swap! [_ f]
@@ -32,7 +32,7 @@
 
   IHash
   (-hash [_]
-    (hash* (deref) all-segments backing-store-hash))
+    (hash* (deref!) all-segments backing-store-hash))
 
   IEquiv
   (-equiv [o o']
