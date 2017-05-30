@@ -1,13 +1,12 @@
 (ns cursor.core
-  (:require [cursor.cursor :refer [->Cursor]]
-            [cursor.ref-cursor :refer [->RefCursor]]))
+  (:require [cursor.cursor :refer [->Cursor]]))
 
 
 (defn virtual-cursor [val write! ref]
-  (->Cursor val write! [] (hash ref)))
+  (->Cursor (constantly val) write! [] (hash ref) true))
 
-(defn virtual-ref-cursor [deref! write! ref]
-  (->RefCursor deref! write! [] (hash ref)))
+(defn virtual-ref-cursor [deref write! ref]
+  (->Cursor deref write! [] (hash ref) false))
 
 
 (defn cursor [store]

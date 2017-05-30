@@ -3,19 +3,17 @@
             [clojure.string :as string]))
 
 
-(defn deref* [value] value)
-
-
-(defn invoke* [ctor value swap-fn! segments all-segments backing-store-hash & {:keys [not-found invalid?]
-                                                                               :or {not-found nil
-                                                                                    invalid? (constantly false)}}]
-  (let [leaf-val (get-in' value segments invalid? not-found)]
+(defn invoke* [ctor deref swap-fn! segments all-segments backing-store-hash value-cursor? & {:keys [not-found invalid?]
+                                                                                             :or {not-found nil
+                                                                                                  invalid? (constantly false)}}]
+  (let [leaf-val #(get-in' (deref) segments invalid? not-found)]
     (ctor
       leaf-val
       (fn [f]
         (swap-fn! (root-at segments f invalid? not-found)))
       (concat all-segments segments)
-      backing-store-hash)))
+      backing-store-hash
+      value-cursor?)))
 
 
 (defn swap!* [swap-fn! f & args]
@@ -26,7 +24,8 @@
   (swap! o (constantly v)))
 
 
-(defn hash* [& args]
-  (->> (map hash args)
-       (string/join "-")
-       hash))
+(defn hash* [deref all-segments backing-store-hash value-cursor?]
+  (let [deref-hash (when value-cursor? (hash (deref)))]
+    (->> [deref-hash (hash all-segments) backing-store-hash]
+         (string/join "-")
+         hash)))
